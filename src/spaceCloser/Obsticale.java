@@ -3,8 +3,8 @@ package spaceCloser;
 import java.awt.Color;
 
 public class Obsticale extends Lib{
-	//private int X;
-	//private int Y;
+
+
 	private int direction = 1;
 	private int nextX;
 	private int nextY;
@@ -17,7 +17,11 @@ public class Obsticale extends Lib{
 		this.direction = d;
 		setDirection(this.direction);
 	}
-	
+
+	/**
+	 * sets the movement on the screen to be like ethe direction is.
+	 * @param n
+	 */
 	public void setDirection(int n){
 		this.direction = n;
 		switch(direction){
@@ -39,9 +43,7 @@ public class Obsticale extends Lib{
 				nextX = X - 1;
 				nextY = Y - 1;
 			}break;
-
 		}
-		
 	}
 
 	public  void setPlase(){
@@ -71,16 +73,8 @@ public class Obsticale extends Lib{
 		return nextX;
 	}
 
-	public void setNextX(int nextx) {
-		nextX = nextx;
-	}
-
 	public int getNextY() {
 		return nextY;
-	}
-
-	public  void setNextY(int nexty) {
-		nextY = nexty;
 	}
 
 	public int getDirection() {
@@ -100,27 +94,37 @@ public class Obsticale extends Lib{
 		this.isSmall = isSmall;
 	}
 
+	/**
+	 * the function returns the number of obstacles in the area of the lib (x ,y).
+	 * this is an implementation of DFS algorithm.
+	 * @param map
+	 * @param x
+	 * @param y
+	 * @param counter
+	 * @return
+	 */
 	public int fullSectors(Lib[][] map , int x , int y, int counter){
 		
 		if(map[x][y].getColor() == 0 || map[x][y].getSection() == 0){
 			return 0;
 		}
-			map[x][y].setSection(0);
+
+		map[x][y].setSection(0);
 			
-			counter = 1 + counter
-			+fullSectors(map , x - 1, y - 1,counter)
-			+fullSectors(map , x, y - 1,counter)
-			+fullSectors(map , x + 1, y - 1 , counter)
-			+fullSectors(map , x + 1, y , counter)
-			+fullSectors(map , x + 1, y + 1 , counter)
-			+fullSectors(map , x, y + 1 , counter)
-			+fullSectors(map , x - 1, y + 1 , counter)
-			+fullSectors(map , x - 1, y , counter);
+		counter = 1 + counter
+		+fullSectors(map , x - 1, y - 1,counter)
+		+fullSectors(map , x, y - 1,counter)
+		+fullSectors(map , x + 1, y - 1 , counter)
+		+fullSectors(map , x + 1, y , counter)
+		+fullSectors(map , x + 1, y + 1 , counter)
+		+fullSectors(map , x, y + 1 , counter)
+		+fullSectors(map , x - 1, y + 1 , counter)
+		+fullSectors(map , x - 1, y , counter);
 			
-			return counter;		
+		return counter;
 	}
-	
-	
+
+
 	public boolean MoveObs(Lib[][] map, Color[] colors){
 		
 		boolean gameOn = true;

@@ -6,87 +6,102 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Stack;
-
 import javax.swing.Timer;
-
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 public class Board extends JFrame implements ActionListener{
 
+	/**
+	 * the instance of the class itself.
+	 */
 	private static Board b;
 
+	/**
+	 * keeps the level of the game that the player got to, gets up every time the player closed about 70% of the space.
+	 */
 	private static int level = 1;
 
+	/**
+	 * the remaing times that the player has to play gets down with every time the player failed to pass stage.
+	 */
 	private static int timesToPlay = 5;
 
+	/**
+	 * keeps the location of the player.
+	 */
 	private static int playerX = 500;
 	private static int playerY = 480;
 
+	/**
+	 * true as long as the game keeps going.
+	 */
 	private static boolean gameOn = true;
 
+	/**
+	 * makes sure every thing that depand in time hapens when it suppose to.
+	 */
 	private Timer timer;
+
+	/**
+	 * the grafics class, responsiblr for the presentation layer of the game.
+	 */
 	private static GraficxClass gc;
 
+	/**
+	 * show to the player the status of the game that he is in, and the times he has remaining to play.
+	 */
 	JLabel statusbar = new JLabel("0%");
 	JLabel statusbar1 = new JLabel("The Level is: " + this.level + "there is more: " + this.timesToPlay + "times to play");
 
+	/**
+	 * ctor for the Board class.
+	 */
 	public Board(){
+		//seting the bounds and the timer to have the correct values.
 		setBounds(5, 5, 1015, 565);
 		timer = new Timer(300, this); 
-		timer.start();
 
-		gc = new GraficxClass(this,playerX,playerY,1);//1000 , 500);
 
+		//creates new Grafix class.
+		gc = new GraficxClass(this,playerX,playerY,1);
+
+		//setting background and fonts.
 		statusbar.setBackground(new Color(250,250,0));
 		statusbar.setFont(new Font("Tahoma", Font.PLAIN, 32));
+		//statusbar.setBounds(getWidth() / 2, 0, 100, 100);
 		gc.add(statusbar);
 
 		//difined status statusbar
 		statusbar1.setBackground(new Color(250,250,0));
 		statusbar1.setFont(new Font("Tahoma", Font.PLAIN, 25));
+		//statusbar1.setText("The Level is: " + this.level + ".  there are more: " + this.timesToPlay + " times to play");
+		//statusbar1.setBounds(0, 465, 1000, 100);
 		gc.add(statusbar1);
 
+		//adding the graphics class as a component to the frame.
 		add(gc);
 
+		//adding the listeners of the keyboard to the frame as a component too.
 		addKeyListener(new TAdapter());
+
+		timer.start();
 	}
 
-	public JLabel getStatusbar1() {
-		return statusbar1;
-	}
 
-	public void setStatusbar1(JLabel statusbar1) {
-		this.statusbar1 = statusbar1;
-	}
-
-	public JLabel getStatusbar() {
-		return statusbar;
-	}
-
-	public void setStatusbar(JLabel statusbar) {
-		this.statusbar = statusbar;
-	}
-
-	public Timer getTimer() {
-		return timer;
-	}
-
-	public void setTimer(Timer timer) {
-		this.timer = timer;
-	}
-
+	/**
+	 * the logic that happens every round if the timer.
+	 * @param e
+	 */
 	public void actionPerformed(ActionEvent e) {
+		//repainting the
+		repaint();
 
 		statusbar.setBounds(getWidth() / 2, 0, 100, 100);
-
-		statusbar1.setText("The Level is: " + this.level + ".  there are more: " + this.timesToPlay + " times to play");
-
 		statusbar1.setBounds(0, 465, 1000, 100);
 
-
+		//the top precentage that needs to be filled is 70% of the board.
 		if(gc.getMapPrecents() >= 70){
 			level++;
 			gc.levelUp();
@@ -96,13 +111,11 @@ public class Board extends JFrame implements ActionListener{
 			this.playerY = 480;
 			
 			double x = 300 * Math.pow(0.8, level);
-			
-			System.out.println((int)(x - x % 1));
-			
+
 			timer.setDelay((int)(x - x % 1));
 		}
 
-		if(gc != null && (!gc.MoveObs() || gc.isObsHere())){
+		if( (!gc.MoveObs() || gc.isObsHere())){
 			if(timesToPlay > 0){
 				this.gameOn = false;
 				timer.stop();
@@ -128,12 +141,7 @@ public class Board extends JFrame implements ActionListener{
 				JOptionPane.showMessageDialog(null, "GAME OVER!!!!");
 				System.exit(0);
 			}
-		}else{
-			repaint();
 		}
-
-
-
 	}
 
 	class TAdapter extends KeyAdapter {
@@ -199,8 +207,6 @@ public class Board extends JFrame implements ActionListener{
 		}
 	}
 
-
-
 	public static void main(String[] args) {
 		int n = 0;
 
@@ -225,5 +231,35 @@ public class Board extends JFrame implements ActionListener{
 			System.exit(0);
 		}
 	}
+
+
+
+
+	///getters and setters
+
+	public JLabel getStatusbar1() {
+		return statusbar1;
+	}
+
+	public void setStatusbar1(JLabel statusbar1) {
+		this.statusbar1 = statusbar1;
+	}
+
+	public JLabel getStatusbar() {
+		return statusbar;
+	}
+
+	public void setStatusbar(JLabel statusbar) {
+		this.statusbar = statusbar;
+	}
+
+	public Timer getTimer() {
+		return timer;
+	}
+
+	public void setTimer(Timer timer) {
+		this.timer = timer;
+	}
+
 
 }

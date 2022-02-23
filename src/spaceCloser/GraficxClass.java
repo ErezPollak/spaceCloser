@@ -4,52 +4,65 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.Stack;
+import java.util.*;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class GraficxClass extends JPanel{
 
-	final static int width = 50;
+	//the number of points in the map of the game.
+	final int width = 50;
 	final static int hight = 25;
 
-	private static int timesToPlay = 5;
-	private static int level = 1;
-	private static int mapPrecents = 0;
-	private static int mapCovered = 0;
+	//
+	private int timesToPlay = 5;
+	private int level = 1;
+	private int mapPrecents = 0;
+	private int mapCovered = 0;
 
-	private static Lib[][] map = new Lib[hight][width];
-	private static Stack<Lib> eating = new Stack<Lib>();
-	private static Color[] colors = {Color.BLUE, Color.GREEN, Color.RED,Color.BLACK , Color.white};
+	//
+	private Lib[][] map = new Lib[hight][width];
 
-	private static boolean gameOn = true;
+	//keeps all the eaten libs for the white painting
+	private Stack<Lib> eating = new Stack<Lib>();
+
+	//keeps all the colors in an array in order to get them in the right order.
+	private Color[] colors = {Color.BLUE , Color.GREEN , Color.RED , Color.BLACK , Color.white};
+
+	//
+	private boolean gameOn = true;
 
 	//board location
 	private int BoardWidth = 0;
 	private int BoardHight = 0;
 
 	//player location
-	private static int playerX = 500;
-	private static int playerY = 480;
+	private int playerX = 500;
+	private int playerY = 480;
 
 	static JLabel statusbar;
 	static JLabel statusbar1;
 
-	private static Stack<Obsticale> obs = new Stack<Obsticale>();
-	private static Stack<Obsticale> temp = new Stack<Obsticale>();
-	private static Obsticale tempPop;
-	private static Random r = new Random();
+	private Stack<Obsticale> obs = new Stack<Obsticale>();
+	private Stack<Obsticale> temp = new Stack<Obsticale>();
+	private Obsticale tempPop;
+	private Random r = new Random();
 	
 	
 	//actions
 
-	private static boolean firstTime = true; 
+	private boolean firstTime = true;
 
 	Board b;
-	
+
+	/**
+	 * the ctor for the graphics class.
+	 * @param b
+	 * @param playerX
+	 * @param playerY
+	 * @param d
+	 */
 	public GraficxClass(Board b ,int playerX , int playerY , int d){
 
 		this.obs.add(new Obsticale(r.nextInt(20) + 4, r.nextInt(40) + 4, r.nextInt(4) + 1));
@@ -61,13 +74,16 @@ public class GraficxClass extends JPanel{
 		
 		eating.add(new Lib(playerY / 20 , (playerX + 1) / 20, 0 , 0));
 
+		//
 		if(firstTime){
 			//defind map
 			for(int i = 0; i < hight ;i++){
 				for(int j = 0; j < width; j++){ 
 					if((i == 0) || (j == 0) || (i == hight - 1) || (j == width-1)){
+						//painting the inner map in green.
 						map[i][j]  = new Lib(i,j,0,0);
 					}else{
+						//painting the out side with blue.
 						map[i][j]  = new Lib(i,j,1,1);
 					}//if
 				}//j loop
@@ -76,17 +92,18 @@ public class GraficxClass extends JPanel{
 
 		firstTime = false;
 
-		
-		
-		
-
 	}// public GraficxClass
+
+	/**
+	 * the function that happens 30 times a second, and responsible for painting all the board in the right way.
+	 * @param g
+	 */
 	public void paintComponent(Graphics g){
 		super.paintComponent(g);
-		
-		for(int i = 0; i < hight ;i++){
-			for(int j = 0; j < width ; j++){ 
 
+		//at first the function
+		for(int i = 0; i < hight ;i++){
+			for(int j = 0; j < width ; j++){
 				if(map[i][j].getColor() != 2){
 					g.setColor(colors[map[i][j].getColor()]);
 					g.fillRect(map[i][j].getY() * 20,map[i][j].getX() * 20,  20  ,20);
@@ -99,11 +116,9 @@ public class GraficxClass extends JPanel{
 			}
 		}
 
-
 		//drowPlayer
 		g.setColor(colors[3]);
 		g.fillRect(playerX,playerY, 20,20);
-
 
 		//paint white
 		if(eating.size() >= 2){
@@ -117,27 +132,36 @@ public class GraficxClass extends JPanel{
 			eating.push(gray2);
 			eating.push(gray1);
 		}
-
 		//end painting white
-		
-		
-		
+
+
+
+
 		//paint eating
 		if(eating.size() >= 2){
-			Lib l = eating.pop();
-			if(l.getColor() == 1){
-				eating.add(l);
-			}else if(eating.size() >= 2){
-				if(l.getColor() == 0){
-					Lib l2 = eating.pop();
-					if(l2.getColor() == 4){
-							if(l.getColor() == 4){
-								this.gameOn = false;
-							}
 
-							eating.add(l2);
-							eating.add(l);
-							//closing algorithem...
+			Lib l = eating.pop();
+
+			if(l.getColor() == 1){
+
+				eating.add(l);
+
+			}else if(eating.size() >= 2){
+
+				//if size >= 3 and the first color is not green so its ether blue or wight
+
+				if(l.getColor() == 0){
+
+					Lib l2 = eating.pop();
+
+					if(l2.getColor() == 4){
+
+						if(l.getColor() == 4){
+							this.gameOn = false;
+						}
+								eating.add(l2);
+						eating.add(l);
+						//closing algorithem...
 
 							Lib[] temp = new Lib[eating.size()];
 
@@ -157,27 +181,25 @@ public class GraficxClass extends JPanel{
 							}
 
 							int n = 0;
-							
+
 							while(!this.obs.empty()){
 								tempPop = this.obs.pop();
 								n = tempPop.fullSectors(map, tempPop.getX(), tempPop.getY() , 0);
 								System.out.println(n);
 								if(n != 0 && n <= 4 && !tempPop.isSmall()){
 									tempPop.setSmall(true);
-								 	b.getTimer().setDelay(b.getTimer().getDelay() * 2);
+									b.getTimer().setDelay(b.getTimer().getDelay() * 2);
 								}
 								this.temp.push(tempPop);
 							}
 							while(!this.temp.empty()){
 								this.obs.push(this.temp.pop());
 							}
-					
+
 							for(int i = 0; i < hight ;i++){
 								for(int j = 0; j < width ; j++){
 									if(map[i][j].getSection() == 1){
 										map[i][j].setColor(0);
-
-
 									}
 								}
 							}
@@ -189,8 +211,6 @@ public class GraficxClass extends JPanel{
 									}
 								}
 							}
-
-
 
 							this.mapPrecents = ((this.mapCovered * 100 )/ 1104);
 
@@ -205,10 +225,10 @@ public class GraficxClass extends JPanel{
 							this.mapCovered = 0;
 
 							repaint();
-							
+
 							eating.clear();
 							eating.add(l);
-						
+
 					}else if(l2.getColor() == 0){
 						eating.clear();
 						eating.add(l);
@@ -217,6 +237,9 @@ public class GraficxClass extends JPanel{
 					this.gameOn = false;
 				}
 			}else if(eating.size() == 2){
+
+				//if size == 3 and the first color is not green
+
 				eating.clear();
 				eating.add(l);
 			}
@@ -224,11 +247,12 @@ public class GraficxClass extends JPanel{
 		///end of painting eating
 
 	}
-	public static int getMapPrecents() {
+
+
+	public int getMapPrecents() {
 		return mapPrecents;
 	}
 
-	
 	public void reset(int timesToPlay){
 
 		this.mapCovered = 0;
@@ -308,7 +332,7 @@ public class GraficxClass extends JPanel{
 		return l1;
 	}
 	
-	public static boolean MoveObs(){
+	public boolean MoveObs(){
 		while(!obs.empty()){
 			tempPop = obs.pop();
 			tempPop.setDirection(tempPop.getDirection());
@@ -318,9 +342,7 @@ public class GraficxClass extends JPanel{
 		while(!temp.empty()){
 			obs.push(temp.pop());
 		}
-		
 		return gameOn;
-
 	}
 
 	public boolean isObsHere(){
@@ -342,13 +364,10 @@ public class GraficxClass extends JPanel{
 		
 	}
 
+	public void setPlayerX(int playerX) {
 
+		this.playerX = playerX;
 
-	public static int getPlayerX() {
-		return playerX;
-	}
-	public static void setPlayerX(int playerX) {
-		GraficxClass.playerX = playerX;
 		if(eating.size() >= 1){
 			Lib k = eating.pop();
 			if(!(k.getColor() == 0 && map[playerY/20][playerX/20].getColor() == 0)){
@@ -358,11 +377,11 @@ public class GraficxClass extends JPanel{
 		eating.add(map[playerY/20][playerX/20]);
 
 	}
-	public static int getPlayerY() {
-		return playerY;
-	}
-	public static void setPlayerY(int playerY) {
-		GraficxClass.playerY = playerY;
+
+	public void setPlayerY(int playerY) {
+
+		this.playerY = playerY;
+
 		if(eating.size() >= 1){
 			Lib k = eating.pop();
 			if(!(k.getColor() == 0 && map[playerY/20][playerX/20].getColor() == 0)){
@@ -370,16 +389,6 @@ public class GraficxClass extends JPanel{
 			}
 		}
 		eating.add(map[playerY/20][playerX/20]);
-
-
-	}
-	
-	public static void printMap(){
-		for(int i = 0; i < hight ;i++){
-			for(int j = 0; j < width; j++){ 
-				//System.out.print(map[i][j].getColor());
-			}
-		}
 	}
 	
 	public void levelUp(){
@@ -394,5 +403,22 @@ public class GraficxClass extends JPanel{
 		}
 		
 	}
+
+	public void printMap(){
+		for(int i = 0; i < hight ;i++){
+			for(int j = 0; j < width; j++){
+				//System.out.print(map[i][j].getColor());
+			}
+		}
+	}
+
+	public int getPlayerY() {
+		return playerY;
+	}
+
+	public int getPlayerX() {
+		return playerX;
+	}
+
 
 }
