@@ -24,8 +24,8 @@ public class GraficxClass extends JPanel{
 	//
 	private Lib[][] map = new Lib[hight][width];
 
-	//keeps all the eaten libs for the white painting
-	private Stack<Lib> eating = new Stack<Lib>();
+	//keep all the eaten libs
+	private List<Lib> eating = new ArrayList<>();
 
 	//keeps all the colors in an array in order to get them in the right order.
 	private Color[] colors = {Color.BLUE , Color.GREEN , Color.RED , Color.BLACK , Color.white};
@@ -44,9 +44,9 @@ public class GraficxClass extends JPanel{
 	static JLabel statusbar;
 	static JLabel statusbar1;
 
-	private Stack<Obsticale> obs = new Stack<Obsticale>();
-	private Stack<Obsticale> temp = new Stack<Obsticale>();
-	private Obsticale tempPop;
+	//keep all the obstacles in order to iterate.
+	private List<Obsticale> obs = new ArrayList<>();
+
 	private Random r = new Random();
 	
 	
@@ -122,15 +122,13 @@ public class GraficxClass extends JPanel{
 
 		//paint white
 		if(eating.size() >= 2){
-			Lib gray1 = eating.pop();
-			Lib gray2 = eating.pop();
-			if(gray2.getColor() == 1){
-				gray2.setColor(4);
-				map[gray2.getX()][gray2.getY()].setColor(4);
+
+			Lib l = eating.get(eating.size() - 2);
+			if(l.getColor() == 1){
+				l.setColor(4);
+				map[l.getX()][l.getY()].setColor(4);
 				repaint();
 			}
-			eating.push(gray2);
-			eating.push(gray1);
 		}
 		//end painting white
 
@@ -140,7 +138,8 @@ public class GraficxClass extends JPanel{
 		//paint eating
 		if(eating.size() >= 2){
 
-			Lib l = eating.pop();
+			Lib l = eating.get(eating.size() - 1);
+			eating.remove(eating.size() - 1);
 
 			if(l.getColor() == 1){
 
@@ -152,21 +151,23 @@ public class GraficxClass extends JPanel{
 
 				if(l.getColor() == 0){
 
-					Lib l2 = eating.pop();
+					Lib l2 = eating.get(eating.size() - 1);
+					eating.remove(eating.size() - 1);
 
 					if(l2.getColor() == 4){
 
 						if(l.getColor() == 4){
-							this.gameOn = false;
+							//this.gameOn = false;
 						}
-								eating.add(l2);
+						eating.add(l2);
 						eating.add(l);
 						//closing algorithem...
 
 							Lib[] temp = new Lib[eating.size()];
 
 							for (int i = 0; i < temp.length; i++) {
-								temp[i] = eating.pop();
+								temp[i] = eating.get(eating.size() - 1);
+								eating.remove(eating.size() - 1);
 								map[temp[i].getX()][temp[i].getY()].setColor(0);
 								repaint();
 							}
@@ -180,22 +181,14 @@ public class GraficxClass extends JPanel{
 								}
 							}
 
-							int n = 0;
+							//int n = 0;
 
-							while(!this.obs.empty()){
-								tempPop = this.obs.pop();
-								n = tempPop.fullSectors(map, tempPop.getX(), tempPop.getY() , 0);
-								System.out.println(n);
-								if(n != 0 && n <= 4 && !tempPop.isSmall()){
-									tempPop.setSmall(true);
-									b.getTimer().setDelay(b.getTimer().getDelay() * 2);
-								}
-								this.temp.push(tempPop);
-							}
-							while(!this.temp.empty()){
-								this.obs.push(this.temp.pop());
+							//setting sections according to the locations of the obstacles.
+							for(Obsticale ob : obs){
+								ob.fullSectors(map, ob.getX(), ob.getY() , 0);
 							}
 
+							//paints what left in one section.
 							for(int i = 0; i < hight ;i++){
 								for(int j = 0; j < width ; j++){
 									if(map[i][j].getSection() == 1){
@@ -204,6 +197,7 @@ public class GraficxClass extends JPanel{
 								}
 							}
 
+							//updats the map coverd element.
 							for(int i = 1; i < hight -1;i++){
 								for(int j = 1; j < width - 1; j++){
 									if(map[i][j].getColor() == 0){
@@ -212,6 +206,7 @@ public class GraficxClass extends JPanel{
 								}
 							}
 
+							//caculate map precentage
 							this.mapPrecents = ((this.mapCovered * 100 )/ 1104);
 
 							b.getStatusbar().setText(this.mapPrecents + "%");
@@ -234,7 +229,7 @@ public class GraficxClass extends JPanel{
 						eating.add(l);
 					}
 				}else{
-					this.gameOn = false;
+					//this.gameOn = false;
 				}
 			}else if(eating.size() == 2){
 
@@ -248,8 +243,17 @@ public class GraficxClass extends JPanel{
 
 	}
 
+	public void paintEating(){
+		if(eating.get(eating.size() - 1).color == 4){
+			this.gameOn = false;
+		}else if(eating.get(eating.size() - 1).color == 0){
+
+		}
+	}
+
 
 	public int getMapPrecents() {
+		repaint();
 		return mapPrecents;
 	}
 
@@ -277,17 +281,12 @@ public class GraficxClass extends JPanel{
 		this.playerX = 500;
 		this.playerY = 480;
 
-		while(!this.obs.empty()){
-			tempPop.setSmall(false);
-			tempPop = this.obs.pop();
-			tempPop.setX(r.nextInt(10) + 4);
-			tempPop.setY(r.nextInt(20) + 4);
-			this.temp.push(tempPop);
+		for(Obsticale ob : obs){
+			ob.setSmall(false);
+			ob.setX(r.nextInt(10) + 4);
+			ob.setY(r.nextInt(20) + 4);
 		}
-		while(!this.temp.empty()){
-			this.obs.push(this.temp.pop());
-		}
-		
+
 		this.gameOn = true;
 	}
 
@@ -298,8 +297,9 @@ public class GraficxClass extends JPanel{
 
 		Lib l1 = null;
 		
-		while(!this.eating.empty()){
-			l1 = eating.pop();
+		while(!(this.eating.size() == 0)){
+			l1 = eating.get(eating.size() - 1);
+			eating.remove(eating.size() - 1);
 			l1.setColor(1);
 			l1.setSection(1);
 			
@@ -333,33 +333,24 @@ public class GraficxClass extends JPanel{
 	}
 	
 	public boolean MoveObs(){
-		while(!obs.empty()){
-			tempPop = obs.pop();
-			tempPop.setDirection(tempPop.getDirection());
-			gameOn =  gameOn && tempPop.MoveObs(map,colors);
-			temp.push(tempPop);
+
+		for (Obsticale ob : obs){
+			ob.setDirection(ob.getDirection());
+			gameOn = gameOn && ob.MoveObs(map, colors);
 		}
-		while(!temp.empty()){
-			obs.push(temp.pop());
-		}
+
 		return gameOn;
 	}
 
 	public boolean isObsHere(){
 		
 		boolean b = false;
-		
-		while(!obs.empty()){
-			tempPop = obs.pop();
-			if(tempPop.isObsHere(this.playerX / 20, this.playerY / 20)){
+
+		for(Obsticale ob : obs){
+			if(ob.isObsHere(this.playerX / 20, this.playerY / 20)){
 				b = true;
 			}
-			temp.push(tempPop);
 		}
-		while(!temp.empty()){
-			obs.push(temp.pop());
-		}
-		
 		return b;
 		
 	}
@@ -369,13 +360,14 @@ public class GraficxClass extends JPanel{
 		this.playerX = playerX;
 
 		if(eating.size() >= 1){
-			Lib k = eating.pop();
+			Lib k = eating.get(eating.size() - 1);
+			eating.remove(eating.size() - 1);
 			if(!(k.getColor() == 0 && map[playerY/20][playerX/20].getColor() == 0)){
 				eating.add(k);
 			}
 		}
 		eating.add(map[playerY/20][playerX/20]);
-
+		paintEating();
 	}
 
 	public void setPlayerY(int playerY) {
@@ -383,31 +375,24 @@ public class GraficxClass extends JPanel{
 		this.playerY = playerY;
 
 		if(eating.size() >= 1){
-			Lib k = eating.pop();
+			Lib k = eating.get(eating.size() - 1);
+			eating.remove(eating.size() - 1);
 			if(!(k.getColor() == 0 && map[playerY/20][playerX/20].getColor() == 0)){
 				eating.add(k);
 			}
 		}
 		eating.add(map[playerY/20][playerX/20]);
+		paintEating();
 	}
 	
 	public void levelUp(){
 		this.obs.add(new Obsticale(r.nextInt(20) + 4, r.nextInt(40) + 4, r.nextInt(4) + 1));
-		
-		while(!obs.empty()){
-			tempPop = obs.pop();
-			temp.push(tempPop);
-		}
-		while(!temp.empty()){
-			obs.push(temp.pop());
-		}
-		
 	}
 
 	public void printMap(){
 		for(int i = 0; i < hight ;i++){
 			for(int j = 0; j < width; j++){
-				//System.out.print(map[i][j].getColor());
+				System.out.print(map[i][j].getColor());
 			}
 		}
 	}
