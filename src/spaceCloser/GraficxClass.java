@@ -120,140 +120,75 @@ public class GraficxClass extends JPanel{
 		g.setColor(colors[3]);
 		g.fillRect(playerX,playerY, 20,20);
 
-		//paint white
-		if(eating.size() >= 2){
-
-			Lib l = eating.get(eating.size() - 2);
-			if(l.getColor() == 1){
-				l.setColor(4);
-				map[l.getX()][l.getY()].setColor(4);
-				repaint();
-			}
-		}
-		//end painting white
-
-
-
-
-		//paint eating
-		if(eating.size() >= 2){
-
-			Lib l = eating.get(eating.size() - 1);
-			eating.remove(eating.size() - 1);
-
-			if(l.getColor() == 1){
-
-				eating.add(l);
-
-			}else if(eating.size() >= 2){
-
-				//if size >= 3 and the first color is not green so its ether blue or wight
-
-				if(l.getColor() == 0){
-
-					Lib l2 = eating.get(eating.size() - 1);
-					eating.remove(eating.size() - 1);
-
-					if(l2.getColor() == 4){
-
-						if(l.getColor() == 4){
-							//this.gameOn = false;
-						}
-						eating.add(l2);
-						eating.add(l);
-						//closing algorithem...
-
-							Lib[] temp = new Lib[eating.size()];
-
-							for (int i = 0; i < temp.length; i++) {
-								temp[i] = eating.get(eating.size() - 1);
-								eating.remove(eating.size() - 1);
-								map[temp[i].getX()][temp[i].getY()].setColor(0);
-								repaint();
-							}
-
-							//ready to before
-							for(int i = 0; i < hight ;i++){
-								for(int j = 0; j < width ; j++){
-									if(map[i][j].getColor() != 0){
-										map[i][j].setSection(1);
-									}
-								}
-							}
-
-							//int n = 0;
-
-							//setting sections according to the locations of the obstacles.
-							for(Obsticale ob : obs){
-								ob.fullSectors(map, ob.getX(), ob.getY() , 0);
-							}
-
-							//paints what left in one section.
-							for(int i = 0; i < hight ;i++){
-								for(int j = 0; j < width ; j++){
-									if(map[i][j].getSection() == 1){
-										map[i][j].setColor(0);
-									}
-								}
-							}
-
-							//updats the map coverd element.
-							for(int i = 1; i < hight -1;i++){
-								for(int j = 1; j < width - 1; j++){
-									if(map[i][j].getColor() == 0){
-										this.mapCovered++;
-									}
-								}
-							}
-
-							//caculate map precentage
-							this.mapPrecents = ((this.mapCovered * 100 )/ 1104);
-
-							b.getStatusbar().setText(this.mapPrecents + "%");
-
-							if(this.mapPrecents >= 70){
-								this.level++;
-								b.getStatusbar1().setText("The Level is: " + this.level + "  there are more: " + this.timesToPlay + " times to play");
-
-							}
-
-							this.mapCovered = 0;
-
-							repaint();
-
-							eating.clear();
-							eating.add(l);
-
-					}else if(l2.getColor() == 0){
-						eating.clear();
-						eating.add(l);
-					}
-				}else{
-					//this.gameOn = false;
-				}
-			}else if(eating.size() == 2){
-
-				//if size == 3 and the first color is not green
-
-				eating.clear();
-				eating.add(l);
-			}
-		}
-		///end of painting eating
-
 	}
 
+	/**
+	 * the function that paints what we need to paint in blue every time the circle closes.
+	 */
 	public void paintEating(){
 		if(eating.get(eating.size() - 1).color == 4){
 			this.gameOn = false;
 		}else if(eating.get(eating.size() - 1).color == 0){
+
+			for(Lib l : eating){
+				l.setColor(0);
+			}
+
+			for(int i = 0; i < hight ;i++){
+				for(int j = 0; j < width ; j++){
+					if(map[i][j].getColor() != 0){
+						map[i][j].setSection(1);
+					}
+				}
+			}
+
+			//setting sections according to the locations of the obstacles.
+			for(Obsticale ob : obs){
+				ob.fullSectors(map, ob.getX(), ob.getY() , 0);
+			}
+
+			//paints what left in one section.
+			for(int i = 0; i < hight ;i++){
+				for(int j = 0; j < width ; j++){
+					if(map[i][j].getSection() == 1){
+						map[i][j].setColor(0);
+					}
+				}
+			}
+
+
+			//updats the map coverd element.
+			for(int i = 1; i < hight -1;i++){
+				for(int j = 1; j < width - 1; j++){
+					if(map[i][j].getColor() == 0){
+						this.mapCovered++;
+					}
+				}
+			}
+
+			//caculate map precentage
+			this.mapPrecents = ((this.mapCovered * 100 )/ 1104);
+
+			b.getStatusbar().setText(this.mapPrecents + "%");
+
+			if(this.mapPrecents >= 70){
+				this.level++;
+				b.getStatusbar1().setText("The Level is: " + this.level + "  there are more: " + this.timesToPlay + " times to play");
+
+			}
+
+			this.mapCovered = 0;
+
+			//restors only the last element in the list.
+			Lib l = eating.get(eating.size() -1);
+			eating.clear();
+			eating.add(l);
 
 		}
 	}
 
 
 	public int getMapPrecents() {
-		repaint();
 		return mapPrecents;
 	}
 
@@ -295,38 +230,25 @@ public class GraficxClass extends JPanel{
 		this.timesToPlay = timesToPlay;
 		b.getStatusbar1().setText("The Level is: " + this.level + ".  there are more: " + this.timesToPlay + " times to play");
 
-		Lib l1 = null;
-		
-		while(!(this.eating.size() == 0)){
-			l1 = eating.get(eating.size() - 1);
-			eating.remove(eating.size() - 1);
-			l1.setColor(1);
-			l1.setSection(1);
-			
+		Lib l1 = eating.get(0);
+
+		for(Lib l : eating){
+			if(l.color != 0){
+				l.setColor(1);
+				l.setSection(1);
+			}
 		}
 
 		playerX = l1.getY() * 20;
 		playerY = l1.getX() * 20;
-		
-		
+
 		l1.setColor(0);
 		l1.setSection(0);
 		
 		this.eating.clear();
 		
 		eating.add(l1);
-		
-		for(int i = 0; i < hight ;i++){
-			for(int j = 0; j < width; j++){ 
-				if(map[i][j].getColor() != 0){
-					map[i][j]  = new Lib(i,j,1,1);
-				}//if
-				
-				if((i == 0) || (j == 0) || (i == hight - 1) || (j == width-1)){
-					map[i][j]  = new Lib(i,j,0,0);
-				}
-			}//j loop
-		}//i loop
+
 		this.gameOn = true;
 		
 		return l1;
@@ -359,30 +281,37 @@ public class GraficxClass extends JPanel{
 
 		this.playerX = playerX;
 
-		if(eating.size() >= 1){
-			Lib k = eating.get(eating.size() - 1);
-			eating.remove(eating.size() - 1);
-			if(!(k.getColor() == 0 && map[playerY/20][playerX/20].getColor() == 0)){
-				eating.add(k);
-			}
+		if(eating.size() != 0 && eating.get(eating.size() - 1).color == 1){
+			eating.get(eating.size()-1).setColor(4);
 		}
 		eating.add(map[playerY/20][playerX/20]);
+
+		if(map[playerY/20][playerX/20].color == 0 && eating.get(eating.size() - 2).color == 0){
+			eating.remove(eating.size() - 2);
+		}
+
+//		eating.add(map[playerY/20][playerX/20]);
+		System.out.println("before " + eating);
 		paintEating();
+		System.out.println("after" + eating);
 	}
 
 	public void setPlayerY(int playerY) {
 
 		this.playerY = playerY;
 
-		if(eating.size() >= 1){
-			Lib k = eating.get(eating.size() - 1);
-			eating.remove(eating.size() - 1);
-			if(!(k.getColor() == 0 && map[playerY/20][playerX/20].getColor() == 0)){
-				eating.add(k);
-			}
+		if(eating.size() != 0 &&eating.get(eating.size()-1).color == 1){
+			eating.get(eating.size()-1).setColor(4);
 		}
 		eating.add(map[playerY/20][playerX/20]);
+
+		if(map[playerY/20][playerX/20].color == 0 && eating.get(eating.size() - 2).color == 0){
+			eating.remove(eating.size() - 2);
+		}
+
+		System.out.println("before " + eating);
 		paintEating();
+		System.out.println("after" + eating);
 	}
 	
 	public void levelUp(){
