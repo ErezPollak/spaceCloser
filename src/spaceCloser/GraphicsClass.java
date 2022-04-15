@@ -1,28 +1,33 @@
 package spaceCloser;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
 import java.util.*;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class GraficxClass extends JPanel{
+public class GraphicsClass extends JPanel{
 
 	//the number of points in the map of the game.
 	final int width = 50;
-	final static int hight = 25;
+	final static int height = 25;
 
 	//
-	private int timesToPlay = 5;
-	private int level = 1;
-	private int mapPrecents = 0;
+	private int timesToPlay;
+	private int level;
+	private int mapPresents;
+
+	{
+		level = 1;
+		timesToPlay = 5;
+		mapPresents = 0;
+	}
+
 	private int mapCovered = 0;
 
 	//
-	private Lib[][] map = new Lib[hight][width];
+	private final Lib[][] map = new Lib[height][width];
 
 	//keep all the eaten libs
 	private List<Lib> eating = new ArrayList<>();
@@ -35,7 +40,7 @@ public class GraficxClass extends JPanel{
 
 	//board location
 	private int BoardWidth = 0;
-	private int BoardHight = 0;
+	private final int BoardHight = 0;
 
 	//player location
 	private int playerX = 500;
@@ -63,7 +68,7 @@ public class GraficxClass extends JPanel{
 	 * @param playerY
 	 * @param d
 	 */
-	public GraficxClass(Board b ,int playerX , int playerY , int d){
+	public GraphicsClass(Board b , int playerX , int playerY , int d){
 
 		this.obs.add(new Obsticale(r.nextInt(20) + 4, r.nextInt(40) + 4, r.nextInt(4) + 1));
 		
@@ -77,9 +82,9 @@ public class GraficxClass extends JPanel{
 		//
 		if(firstTime){
 			//defind map
-			for(int i = 0; i < hight ;i++){
+			for(int i = 0; i < height; i++){
 				for(int j = 0; j < width; j++){ 
-					if((i == 0) || (j == 0) || (i == hight - 1) || (j == width-1)){
+					if((i == 0) || (j == 0) || (i == height - 1) || (j == width-1)){
 						//painting the inner map in green.
 						map[i][j]  = new Lib(i,j,0,0);
 					}else{
@@ -102,7 +107,7 @@ public class GraficxClass extends JPanel{
 		super.paintComponent(g);
 
 		//at first the function
-		for(int i = 0; i < hight ;i++){
+		for(int i = 0; i < height; i++){
 			for(int j = 0; j < width ; j++){
 				if(map[i][j].getColor() != 2){
 					g.setColor(colors[map[i][j].getColor()]);
@@ -134,7 +139,7 @@ public class GraficxClass extends JPanel{
 				l.setColor(0);
 			}
 
-			for(int i = 0; i < hight ;i++){
+			for(int i = 0; i < height; i++){
 				for(int j = 0; j < width ; j++){
 					if(map[i][j].getColor() != 0){
 						map[i][j].setSection(1);
@@ -148,7 +153,7 @@ public class GraficxClass extends JPanel{
 			}
 
 			//paints what left in one section.
-			for(int i = 0; i < hight ;i++){
+			for(int i = 0; i < height; i++){
 				for(int j = 0; j < width ; j++){
 					if(map[i][j].getSection() == 1){
 						map[i][j].setColor(0);
@@ -158,7 +163,7 @@ public class GraficxClass extends JPanel{
 
 
 			//updats the map coverd element.
-			for(int i = 1; i < hight -1;i++){
+			for(int i = 1; i < height -1; i++){
 				for(int j = 1; j < width - 1; j++){
 					if(map[i][j].getColor() == 0){
 						this.mapCovered++;
@@ -167,11 +172,11 @@ public class GraficxClass extends JPanel{
 			}
 
 			//caculate map precentage
-			this.mapPrecents = ((this.mapCovered * 100 )/ 1104);
+			this.mapPresents = ((this.mapCovered * 100 )/ 1104);
 
-			b.getStatusbar().setText(this.mapPrecents + "%");
+			b.getStatusbar().setText(this.mapPresents + "%");
 
-			if(this.mapPrecents >= 70){
+			if(this.mapPresents >= 70){
 				this.level++;
 				b.getStatusbar1().setText("The Level is: " + this.level + "  there are more: " + this.timesToPlay + " times to play");
 
@@ -188,22 +193,22 @@ public class GraficxClass extends JPanel{
 	}
 
 
-	public int getMapPrecents() {
-		return mapPrecents;
+	public int getMapPresents() {
+		return mapPresents;
 	}
 
 	public void reset(int timesToPlay){
 
 		this.mapCovered = 0;
-		this.mapPrecents = 0;
+		this.mapPresents = 0;
 
 		this.timesToPlay = timesToPlay;
 		b.getStatusbar1().setText("The Level is: " + this.level + ".  there are more: " + this.timesToPlay + " times to play");
 		b.getStatusbar().setText("0%");
 
-		for(int i = 0; i < hight ;i++){
+		for(int i = 0; i < height; i++){
 			for(int j = 0; j < width; j++){ 
-				if((i == 0) || (j == 0) || (i == hight - 1) || (j == width-1)){
+				if((i == 0) || (j == 0) || (i == height - 1) || (j == width-1)){
 					map[i][j]  = new Lib(i,j,0,0);
 				}else{
 					map[i][j]  = new Lib(i,j,1,1);
@@ -319,7 +324,7 @@ public class GraficxClass extends JPanel{
 	}
 
 	public void printMap(){
-		for(int i = 0; i < hight ;i++){
+		for(int i = 0; i < height; i++){
 			for(int j = 0; j < width; j++){
 				System.out.print(map[i][j].getColor());
 			}

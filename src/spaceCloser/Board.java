@@ -47,7 +47,7 @@ public class Board extends JFrame implements ActionListener{
 	/**
 	 * the grafics class, responsiblr for the presentation layer of the game.
 	 */
-	private static GraficxClass gc;
+	private static GraphicsClass gc;
 
 	/**
 	 * show to the player the status of the game that he is in, and the times he has remaining to play.
@@ -65,7 +65,7 @@ public class Board extends JFrame implements ActionListener{
 
 
 		//creates new Grafix class.
-		gc = new GraficxClass(this,playerX,playerY,1);
+		gc = new GraphicsClass(this,playerX,playerY,1);
 
 		//setting background and fonts.
 		statusbar.setBackground(new Color(250,250,0));
@@ -102,7 +102,7 @@ public class Board extends JFrame implements ActionListener{
 		statusbar1.setBounds(0, 465, 1000, 100);
 
 		//the top precentage that needs to be filled is 70% of the board.
-		if(gc.getMapPrecents() >= 70){
+		if(gc.getMapPresents() >= 70){
 			level++;
 			gc.levelUp();
 			JOptionPane.showMessageDialog(null," level number " + this.level, "" , 1);
