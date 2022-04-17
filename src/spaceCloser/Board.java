@@ -14,38 +14,33 @@ import javax.swing.JOptionPane;
 public class Board extends JFrame implements ActionListener{
 
 	/**
-	 * the instance of the class itself.
-	 */
-	private static Board b;
-
-	/**
 	 * keeps the level of the game that the player got to, gets up every time the player closed about 70% of the space.
 	 */
-	private static int level = 1;
+	private int level;
 
 	/**
-	 * the remaing times that the player has to play gets down with every time the player failed to pass stage.
+	 * the remain times that the player has to play gets down with every time the player failed to pass stage.
 	 */
-	private static int timesToPlay = 5;
+	private int timesToPlay = 5;
 
 	/**
 	 * keeps the location of the player.
 	 */
-	private static int playerX = 500;
-	private static int playerY = 480;
+	private  int playerX;
+	private int playerY;
 
 	/**
 	 * true as long as the game keeps going.
 	 */
-	private static boolean gameOn = true;
+	private boolean gameOn;
 
 	/**
-	 * makes sure every thing that depand in time hapens when it suppose to.
+	 * makes sure every thing that depend on time happens when it supposes to.
 	 */
 	private Timer timer;
 
 	/**
-	 * the grafics class, responsiblr for the presentation layer of the game.
+	 * the graphics class, responsible for the presentation layer of the game.
 	 */
 	private static GraphicsClass gc;
 
@@ -53,31 +48,36 @@ public class Board extends JFrame implements ActionListener{
 	 * show to the player the status of the game that he is in, and the times he has remaining to play.
 	 */
 	JLabel statusbar = new JLabel("0%");
-	JLabel statusbar1 = new JLabel("The Level is: " + this.level + "there is more: " + this.timesToPlay + "times to play");
+	JLabel statusbar1;
+
+	{
+		gameOn = true;
+		playerY = 480;
+		playerX = 500;
+		level = 1;
+		statusbar1 = new JLabel("The Level is: " + level + "there is more: " + this.timesToPlay + "times to play");
+	}
 
 	/**
 	 * ctor for the Board class.
 	 */
 	public Board(){
-		//seting the bounds and the timer to have the correct values.
+		//setting the bounds and the timer to have the correct values.
 		setBounds(5, 5, 1015, 565);
 		timer = new Timer(300, this); 
 
 
-		//creates new Grafix class.
-		gc = new GraphicsClass(this,playerX,playerY,1);
+		//creates new Graphics class.
+		gc = new GraphicsClass(this,playerX,playerY);
 
 		//setting background and fonts.
 		statusbar.setBackground(new Color(250,250,0));
 		statusbar.setFont(new Font("Tahoma", Font.PLAIN, 32));
-		//statusbar.setBounds(getWidth() / 2, 0, 100, 100);
 		gc.add(statusbar);
 
-		//difined status statusbar
+		//defined status statusbar
 		statusbar1.setBackground(new Color(250,250,0));
 		statusbar1.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		//statusbar1.setText("The Level is: " + this.level + ".  there are more: " + this.timesToPlay + " times to play");
-		//statusbar1.setBounds(0, 465, 1000, 100);
 		gc.add(statusbar1);
 
 		//adding the graphics class as a component to the frame.
@@ -92,7 +92,6 @@ public class Board extends JFrame implements ActionListener{
 
 	/**
 	 * the logic that happens every round if the timer.
-	 * @param e
 	 */
 	public void actionPerformed(ActionEvent e) {
 		//repainting the
@@ -101,11 +100,11 @@ public class Board extends JFrame implements ActionListener{
 		statusbar.setBounds(getWidth() / 2, 0, 100, 100);
 		statusbar1.setBounds(0, 465, 1000, 100);
 
-		//the top precentage that needs to be filled is 70% of the board.
+		//the top percentage that needs to be filled is 70% of the board.
 		if(gc.getMapPresents() >= 70){
 			level++;
-			gc.levelUp();
-			JOptionPane.showMessageDialog(null," level number " + this.level, "" , 1);
+			//gc.levelUp();
+			JOptionPane.showMessageDialog(null," level number " + this.level, "" , JOptionPane.INFORMATION_MESSAGE);
 			gc.reset(timesToPlay);
 			this.playerX = 500;
 			this.playerY = 480;
@@ -115,7 +114,8 @@ public class Board extends JFrame implements ActionListener{
 			timer.setDelay((int)(x - x % 1));
 		}
 
-		if( (!gc.MoveObs() || gc.isObsHere())){
+		//check if there is a need to stop the game.
+		if((!gc.MoveObs())){
 			if(timesToPlay > 0){
 				this.gameOn = false;
 				timer.stop();
@@ -126,8 +126,6 @@ public class Board extends JFrame implements ActionListener{
 
 					Lib l2 = gc.resetDuring(timesToPlay);
 
-					System.out.println("b    "+l2.getX()+"    "+l2.getY());
-
 					this.playerX = l2.getY() * 20;
 					this.playerY = l2.getX() * 20;
 
@@ -137,7 +135,6 @@ public class Board extends JFrame implements ActionListener{
 					System.exit(0);
 				}
 			}else{
-
 				JOptionPane.showMessageDialog(null, "GAME OVER!!!!");
 				System.exit(0);
 			}
@@ -152,55 +149,50 @@ public class Board extends JFrame implements ActionListener{
 				int keycode = e.getKeyCode();
 
 				switch (keycode) {
-
-					case KeyEvent.VK_LEFT:{
-						if(timer.isRunning()){
-							if(playerX > 0){
+					case KeyEvent.VK_LEFT -> {
+						if (timer.isRunning()) {
+							if (playerX > 0) {
 								playerX = playerX - 20;
 								gc.setPlayerX(playerX);
 							}
 							repaint();
 						}
-					}break;
-	
-					case KeyEvent.VK_RIGHT:{
-						if(timer.isRunning()){
-							if(playerX < 980){
+					}
+					case KeyEvent.VK_RIGHT -> {
+						if (timer.isRunning()) {
+							if (playerX < 980) {
 								playerX = playerX + 20;
 								gc.setPlayerX(playerX);
 							}
 							repaint();
 						}
-					}break;
-	
-					case KeyEvent.VK_DOWN:{
-						if(timer.isRunning()){
-							if(playerY < 480){
+					}
+					case KeyEvent.VK_DOWN -> {
+						if (timer.isRunning()) {
+							if (playerY < 480) {
 								playerY = playerY + 20;
 								gc.setPlayerY(playerY);
 							}
-							repaint();}
-					}break;
-	
-					case KeyEvent.VK_UP:{
-						if(timer.isRunning()){
-							if(playerY > 0){
+							repaint();
+						}
+					}
+					case KeyEvent.VK_UP -> {
+						if (timer.isRunning()) {
+							if (playerY > 0) {
 								playerY = playerY - 20;
 								gc.setPlayerY(playerY);
 							}
 							repaint();
 						}
-					}break;
-	
-					case KeyEvent.VK_SPACE:{
-						if(timer.isRunning()){
+					}
+					case KeyEvent.VK_SPACE -> {
+						if (timer.isRunning()) {
 							timer.stop();
-						}else{
+						} else {
 							timer.start();
 						}
-	
-					}break;
 
+					}
 				}
 
 			}
@@ -208,23 +200,26 @@ public class Board extends JFrame implements ActionListener{
 	}
 
 	public static void main(String[] args) {
-		int n = 0;
 
-		n = JOptionPane.showConfirmDialog(null,"hellow"+
-				"\n"+"welcame to Space Closer"+
-				"\n"+"the game's aim is to cover as much space as you can from the board,"+
-				"\n"+" by directing the bluck point around the space with the arrows of the keybord."+
-				"\n"+"you have to avoid the red points that are going to appear on the board."+
-				"\n"+"and bluck point must not touch the way it went before closing a space."+
-				"\n"+"the number in the top of the board mantions the number of the precents of the board that you alredy coverd."+
-				"\n"+"you have to close 70% of the board to get to the next level,"+
-				"\n"+"when you do that the red points will double thier speed."+
-				"\n"+"you have 5 lives, when you lose all of them you are out"+
-				"\n"+"good luck!"+
-				"\n"+"ARE YOU READY??"+
-				"\n" , "Space Closer",1);
+		int n = JOptionPane.showConfirmDialog(null, """
+				hello
+				welcome to Space Closer
+				the game's aim is to cover as much space as you can from the board,
+				 by directing the block point around the space with the arrows of the keyboard.
+				you have to avoid the red points that are going to appear on the board.
+				and black point must not touch the way it went before closing a space.
+				the number in the top of the board mansions the number of the presents of the board that you already covered.
+				you have to close 70% of the board to get to the next level,
+				when you do that the red points will double their speed.
+				you have 5 lives, when you lose all of them you are out
+				good luck!
+				ARE YOU READY??
+				""", "Space Closer", JOptionPane.YES_NO_CANCEL_OPTION);
 		if(n == 0){
-			b = new Board();
+			/**
+			 * the instance of the class itself.
+			 */
+			Board b = new Board();
 			b.setVisible(true);
 		}
 		else{
@@ -232,34 +227,12 @@ public class Board extends JFrame implements ActionListener{
 		}
 	}
 
-
-
-
-	///getters and setters
-
 	public JLabel getStatusbar1() {
 		return statusbar1;
-	}
-
-	public void setStatusbar1(JLabel statusbar1) {
-		this.statusbar1 = statusbar1;
 	}
 
 	public JLabel getStatusbar() {
 		return statusbar;
 	}
-
-	public void setStatusbar(JLabel statusbar) {
-		this.statusbar = statusbar;
-	}
-
-	public Timer getTimer() {
-		return timer;
-	}
-
-	public void setTimer(Timer timer) {
-		this.timer = timer;
-	}
-
 
 }
